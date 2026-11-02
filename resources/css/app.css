@@ -44,3 +44,7 @@ body {
     .navigation { flex-direction: column; gap: 0.5rem; }
     .conteneur { padding: 0.75rem; }
 }
+.carte-vedette {
+    border: 2px solid #e0a800;
+    background: #fff8e1;
+}

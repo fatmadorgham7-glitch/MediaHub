@@ -8,9 +8,11 @@ use Illuminate\View\Component;
 
 class Carte extends Component
 {
-    public function __construct(public string $titre)
-    {
-    }
+    public function __construct(
+    public string $titre,
+    public bool $miseEnAvant = false
+) {
+}
 
     public function render(): View|Closure|string
     {

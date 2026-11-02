@@ -12,7 +12,7 @@ class ContenuController extends Controller
     public function index(string $tri = 'recent')
 {
     $contenus = [
-        (object) ['titre' => 'Court-métrage documentaire', 'description' => 'Un aperçu de la vie urbaine.'],
+        (object) ['titre' => 'Court-métrage documentaire', 'description' => 'Un aperçu de la vie urbaine.', 'vedette' => true],
         (object) ['titre' => 'Podcast technologie', 'description' => 'Actualités du développement web.'],
     ];
 
