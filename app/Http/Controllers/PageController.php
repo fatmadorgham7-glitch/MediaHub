@@ -7,10 +7,10 @@ use Illuminate\Http\Request;
 class PageController extends Controller
 {
     public function accueil(){
-        return 'Accueil de MediaHub';
+        return 'Accueil ';
     }
     public function aPropos(){
-        return 'Apropos de  MediaHub';
+        return view('Apropos de  MediaHub');
     }
 
 }

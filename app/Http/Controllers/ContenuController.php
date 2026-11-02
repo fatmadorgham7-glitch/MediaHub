@@ -9,10 +9,15 @@ class ContenuController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        return 'Liste des contenus multimedias';
-    }
+    public function index(string $tri = 'recent')
+{
+    $contenus = [
+        (object) ['titre' => 'Court-métrage documentaire', 'description' => 'Un aperçu de la vie urbaine.'],
+        (object) ['titre' => 'Podcast technologie', 'description' => 'Actualités du développement web.'],
+    ];
+
+    return view('contenus.index', ['contenus' => $contenus, 'tri' => $tri]);
+}
 
     /**
      * Show the form for creating a new resource.

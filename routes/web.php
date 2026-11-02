@@ -17,7 +17,7 @@ Route::get('/a-propos', function () {
     return view('À propos de MediaHub ');
 })->name('a-propos');
 
-Route::get('/', [PageController::class, 'accueil']);
+Route::get('/', [PageController::class, 'accueil'])->name('accueil');
 Route::get('/a-propos', [PageController::class, 'aPropos'])->name('a-propos');
 
 Route::resource('contenus', ContenuController::class);
