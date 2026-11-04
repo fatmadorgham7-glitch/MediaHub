@@ -9,16 +9,17 @@ class ContenuController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(string $tri = 'recent')
-{
-    $contenus = [
-        (object) ['titre' => 'Court-métrage documentaire', 'description' => 'Un aperçu de la vie urbaine.', 'vedette' => true],
-        (object) ['titre' => 'Podcast technologie', 'description' => 'Actualités du développement web.'],
-    ];
+            public function index()
+    {
+        $contenus = \App\Models\Publication::with(['categorie', 'auteur'])
+            ->latest()
+            ->paginate(9);
 
-    return view('contenus.index', ['contenus' => $contenus, 'tri' => $tri]);
-}
-
+        return view('contenus.index', [
+            'contenus' => $contenus,
+            'tri' => 'Du plus récent au plus ancien' // On passe une chaîne pour le texte de la vue
+        ]);
+    }
     /**
      * Show the form for creating a new resource.
      */
@@ -38,11 +39,11 @@ class ContenuController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+         public function show(\App\Models\Publication $publication)
     {
-        return 'Détail du contenu numéro ' . $id;
+        $publication->load(['categorie', 'auteur', 'commentaires.auteur']);
+        return view('contenus.show', ['publication' => $publication]);
     }
-
     /**
      * Show the form for editing the specified resource.
      */
