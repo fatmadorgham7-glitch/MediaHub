@@ -10,7 +10,7 @@
     @include('partials.navigation')
 
     <main class="conteneur">
-            <main class="conteneur">
+            
         
         <!-- 1. Message de succès (bouton vert) -->
         @if (session('succes'))
@@ -40,8 +40,7 @@
 
         @yield('contenu')
     </main>
-        @yield('contenu')
-    </main>
+  
 
     @include('partials.pied-de-page')
 </body>

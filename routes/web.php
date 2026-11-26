@@ -22,3 +22,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 // 5. Route pour les catégories
 Route::get('/categories', [CategorieController::class, 'index'])->name('categories.index');
+
+Route::resource('publications', PublicationController::class)
+    ->parameters(['publications' => 'contenu']);
