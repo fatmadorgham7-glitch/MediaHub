@@ -2,37 +2,56 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Categorie;
+use App\Http\Requests\StoreCategorieRequest;
+use App\Http\Requests\UpdateCategorieRequest;
 
 class CategorieController extends Controller
 {
     public function index()
     {
-        return 'Liste des catégories';
+        // On récupère les catégories avec le nombre de publications
+        $categories = Categorie::withCount('publications')->get();
+        return view('categories.index', compact('categories'));
     }
-        public function store(Request $request)
-    {
-        // 1. On valide les données
-        $request->validate([
-            'nom' => 'required|max:255|min:3',
-            'slug' => 'required|max:255|unique:categories,slug', // Le slug doit être unique
-        ]);
 
-        Categorie::create($request->only('nom', 'slug'));
+    public function create()
+    {
+        return view('categories.create');
+    }
+
+    public function store(StoreCategorieRequest $request)
+    {
+        // Plus besoin de valider manuellement, la FormRequest le fait automatiquement !
+        Categorie::create($request->validated());
         
         return redirect()->route('categories.index')->with('succes', 'Catégorie créée avec succès.');
     }
 
-    public function update(Request $request, Categorie $categorie)
+    public function edit(Categorie $categorie)
     {
-        // 1. On valide les données (on ignore le slug actuel pour la règle unique)
-        $request->validate([
-            'nom' => 'required|max:255|min:3',
-            'slug' => 'required|max:255|unique:categories,slug,' . $categorie->id,
-        ]);
+        return view('categories.edit', compact('categorie'));
+    }
 
-        $categorie->update($request->only('nom', 'slug'));
+    public function update(UpdateCategorieRequest $request, Categorie $categorie)
+    {
+        // La FormRequest UpdateCategorieRequest gère la validation
+        $categorie->update($request->validated());
         
         return redirect()->route('categories.index')->with('succes', 'Catégorie mise à jour avec succès.');
+    }
+
+    public function destroy(Categorie $categorie)
+    {
+        // On garde la sécurité du Mini-Défi de la semaine 7
+        if ($categorie->publications()->count() > 0) {
+            return redirect()
+                ->route('categories.index')
+                ->with('erreur', 'Impossible de supprimer cette catégorie car elle contient des publications.');
+        }
+
+        $categorie->delete();
+        
+        return redirect()->route('categories.index')->with('succes', 'Catégorie supprimée avec succès.');
     }
 }
