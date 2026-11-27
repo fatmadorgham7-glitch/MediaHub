@@ -3,11 +3,12 @@
 namespace Database\Factories;
 
 use App\Models\Categorie;
+use App\Models\Publication;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Publication>
+ * @extends Factory<Publication>
  */
 class PublicationFactory extends Factory
 {
@@ -17,7 +18,7 @@ class PublicationFactory extends Factory
             'titre' => fake()->sentence(6),
             'contenu' => fake()->paragraphs(3, true),
             // On prend une catégorie au hasard parmi celles créées par le seeder
-            'categorie_id' => Categorie::inRandomOrder()->first()->id,
+            'categorie_id' => Categorie::factory(),
             // On crée un nouvel utilisateur automatiquement pour chaque publication
             'user_id' => User::factory(),
         ];

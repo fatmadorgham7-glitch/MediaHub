@@ -21,9 +21,12 @@
                 
                 <!-- Les boutons d'actions -->
                 <div style="margin-top: 10px;">
-                    <a href="{{ route('contenus.show', $contenu) }}">Voir</a> | 
-                    <a href="{{ route('contenus.edit', $contenu) }}">Modifier</a> | 
-                    
+                    <a href="{{ route('contenus.show', $contenu) }}">Voir</a> |
+                    @can('update', $contenu)
+                        <a href="{{ route('contenus.edit', $contenu) }}">Modifier</a> |
+                    @endcan
+
+                    @can('delete', $contenu)
                     <form action="{{ route('contenus.destroy', $contenu) }}" method="POST" style="display:inline;">
                         @csrf
                         @method('DELETE')
@@ -31,6 +34,7 @@
                             Supprimer
                         </button>
                     </form>
+                    @endcan
                 </div>
             </div>
         @empty

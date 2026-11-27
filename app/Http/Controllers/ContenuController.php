@@ -30,9 +30,10 @@ class ContenuController extends Controller
     public function store(StorePublicationRequest $request)
     {
         // La validation est gérée par StorePublicationRequest
-        Publication::create(array_merge($request->validated(), [
-            'user_id' => 1 // Provisoire en attendant la semaine 8
-        ]));
+        Publication::create([
+            ...$request->validated(),
+            'user_id' => auth()->id(),
+        ]);
 
         return redirect()->route('contenus.index')->with('succes', 'Publication créée avec succès.');
     }
@@ -45,12 +46,14 @@ class ContenuController extends Controller
 
     public function edit(Publication $publication)
     {
+        $this->authorize('update', $publication);
         $categories = Categorie::all();
         return view('contenus.edit', compact('publication', 'categories'));
     }
 
     public function update(UpdatePublicationRequest $request, Publication $publication)
     {
+        $this->authorize('update', $publication);
         // La validation est gérée par UpdatePublicationRequest
         $publication->update($request->validated());
 
@@ -59,6 +62,7 @@ class ContenuController extends Controller
 
     public function destroy(Publication $publication)
     {
+        $this->authorize('delete', $publication);
         $publication->delete(); 
         return redirect()->route('contenus.index')->with('succes', 'Publication supprimée avec succès.');
     }

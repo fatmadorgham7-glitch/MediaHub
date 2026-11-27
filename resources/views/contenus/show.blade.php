@@ -15,6 +15,10 @@
         </div>
     </article>
 
+    @can('update', $publication)
+        <p><a href="{{ route('contenus.edit', $publication) }}">Modifier cette publication</a></p>
+    @endcan
+
     <hr>
 
     <section class="commentaires">
