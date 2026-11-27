@@ -21,6 +21,20 @@ class PublicationTest extends TestCase
             ->assertRedirect('/connexion');
     }
 
+    public function test_un_visiteur_est_redirige_vers_la_connexion_pour_ajouter_une_publication(): void
+    {
+        $this->get('/contenus/create')
+            ->assertRedirect('/connexion');
+    }
+
+    public function test_un_auteur_peut_ouvrir_le_formulaire_de_creation(): void
+    {
+        $this->actingAs(User::factory()->create())
+            ->get('/contenus/create')
+            ->assertOk()
+            ->assertSee('Créer une publication');
+    }
+
     public function test_un_auteur_ne_peut_pas_modifier_la_publication_dun_tiers(): void
     {
         $tiers = User::factory()->create();

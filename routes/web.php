@@ -24,15 +24,15 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->post('/deconnexion', [AuthController::class, 'deconnecter'])->name('deconnexion');
 
-Route::resource('contenus', ContenuController::class)
-    ->parameters(['contenus' => 'publication'])
-    ->except(['create', 'store', 'edit', 'update', 'destroy']);
-
 Route::middleware('auth')->group(function () {
     Route::resource('contenus', ContenuController::class)
         ->parameters(['contenus' => 'publication'])
         ->only(['create', 'store', 'edit', 'update', 'destroy']);
 });
+
+Route::resource('contenus', ContenuController::class)
+    ->parameters(['contenus' => 'publication'])
+    ->except(['create', 'store', 'edit', 'update', 'destroy']);
 
 // 4. Routes pour l'administration
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
