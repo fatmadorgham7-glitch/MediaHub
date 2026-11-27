@@ -12,25 +12,30 @@ class CategorieSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('categories')->insert([
+        foreach ([
             [
-                'nom' => 'Vidéo', 
+                'nom' => 'Vidéo',
                 'slug' => 'video',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'nom' => 'Audio', 
+                'nom' => 'Audio',
                 'slug' => 'audio',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'nom' => 'Image', 
+                'nom' => 'Image',
                 'slug' => 'image',
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-        ]);
+        ] as $categorie) {
+            DB::table('categories')->updateOrInsert(
+                ['slug' => $categorie['slug']],
+                $categorie
+            );
+        }
     }
 }

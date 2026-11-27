@@ -9,7 +9,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-        public function up(): void
+    public function up(): void
     {
         Schema::table('publications', function (Blueprint $table) {
             $table->string('image')->nullable();
@@ -22,6 +22,7 @@ return new class extends Migration
     {
         Schema::table('publications', function (Blueprint $table) {
             $table->dropColumn('image');
+            $table->dropUnique(['titre']);
         });
     }
 };

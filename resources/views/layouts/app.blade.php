@@ -10,8 +10,6 @@
     @include('partials.navigation')
 
     <main class="conteneur">
-            <main class="conteneur">
-        
         <!-- 1. Message de succès (bouton vert) -->
         @if (session('succes'))
             <div style="background-color: #d4edda; color: #155724; padding: 15px; margin-bottom: 20px; border-radius: 5px; border: 1px solid #c3e6cb;">
@@ -38,8 +36,6 @@
             </div>
         @endif
 
-        @yield('contenu')
-    </main>
         @yield('contenu')
     </main>
 

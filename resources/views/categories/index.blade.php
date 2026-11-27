@@ -23,4 +23,5 @@
     @empty
         <p>Aucune catégorie disponible.</p>
     @endforelse
+    {{ $categories->links() }}
 @endsection

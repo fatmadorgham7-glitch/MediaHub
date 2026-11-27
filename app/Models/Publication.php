@@ -4,7 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes; 
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
+use RuntimeException;
 
 class Publication extends Model
 {
@@ -15,8 +18,35 @@ class Publication extends Model
         'contenu',
         'categorie_id',
         'user_id',
+        'image',
+        'fichier_media',
+        'type_media',
     ];
-        public function categorie()
+
+    protected static function booted(): void
+    {
+        static::saved(function () {
+            Cache::forget('categories.liste');
+        });
+
+        static::deleted(function () {
+            Cache::forget('categories.liste');
+        });
+
+        static::restored(function () {
+            Cache::forget('categories.liste');
+        });
+
+        static::forceDeleted(function (Publication $publication) {
+            foreach ([$publication->image, $publication->fichier_media] as $chemin) {
+                if ($chemin && ! Storage::disk('public')->delete($chemin)) {
+                    throw new RuntimeException("Impossible de supprimer le fichier média « {$chemin} ».");
+                }
+            }
+        });
+    }
+
+    public function categorie()
     {
         return $this->belongsTo(Categorie::class);
     }

@@ -20,6 +20,7 @@ class AuthController extends Controller
     {
         $utilisateur = User::create($request->validated());
         Auth::login($utilisateur);
+        $request->session()->regenerate();
 
         return redirect()->route('accueil')
             ->with('succes', 'Bienvenue sur MediaHub.');
@@ -35,10 +36,16 @@ class AuthController extends Controller
         $identifiants = $request->validate([
             'email' => 'required|email',
             'password' => 'required|string',
+        ], [
+            'email.required' => 'L’adresse e-mail est obligatoire.',
+            'email.email' => 'L’adresse e-mail n’est pas valide.',
+            'password.required' => 'Le mot de passe est obligatoire.',
         ]);
 
         if (! Auth::attempt($identifiants)) {
-            return back()->withErrors(['email' => 'Identifiants incorrects.'])->withInput();
+            return back()
+                ->withErrors(['email' => 'Identifiants incorrects.'])
+                ->withInput($request->only('email'));
         }
 
         $request->session()->regenerate();

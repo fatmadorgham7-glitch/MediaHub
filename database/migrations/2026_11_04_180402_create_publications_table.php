@@ -13,11 +13,11 @@ return new class extends Migration
             $table->string('titre');
             $table->text('contenu');
             $table->foreignId('categorie_id')
-                  ->constrained('categories')
-                  ->cascadeOnDelete();
+                ->constrained('categories')
+                ->cascadeOnDelete();
             $table->foreignId('user_id')
-                  ->constrained('users')
-                  ->cascadeOnDelete();
+                ->constrained('users')
+                ->cascadeOnDelete();
             $table->timestamps();
         });
     }

@@ -2,21 +2,22 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Commentaire extends Model
 {
-     use HasFactory;
+    use HasFactory;
 
     protected $fillable = [
-        'titre',
         'contenu',
-        'categorie_id',
+        'publication_id',
         'user_id',
     ];
-        public function categorie()
+
+    public function publication()
     {
-        return $this->belongsTo(Categorie::class);
+        return $this->belongsTo(Publication::class);
     }
 
     public function auteur()

@@ -13,7 +13,8 @@ class Categorie extends Model
         'nom',
         'slug',
     ];
-        public function publications()
+
+    public function publications()
     {
         return $this->hasMany(Publication::class);
     }

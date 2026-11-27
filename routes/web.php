@@ -35,7 +35,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // 4. Routes pour l'administration
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/tableau-de-bord', [AdminController::class, 'index'])->name('dashboard');
 });
 

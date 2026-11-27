@@ -5,7 +5,7 @@
 @section('contenu')
     <h1>Modifier la publication</h1>
 
-    <form method="POST" action="{{ route('contenus.update', $publication) }}">
+    <form method="POST" action="{{ route('contenus.update', $publication) }}" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -19,7 +19,7 @@
             <label>Catégorie :</label><br>
             <select name="categorie_id" style="width: 100%;">
                 @foreach($categories as $categorie)
-                    <option value="{{ $categorie->id }}" {{ $publication->categorie_id == $categorie->id ? 'selected' : '' }}>
+                    <option value="{{ $categorie->id }}" @selected(old('categorie_id', $publication->categorie_id) == $categorie->id)>
                         {{ $categorie->nom }}
                     </option>
                 @endforeach
@@ -31,6 +31,18 @@
             <label>Contenu :</label><br>
             <textarea name="contenu" rows="5" style="width: 100%;">{{ old('contenu', $publication->contenu) }}</textarea>
             @error('contenu') <span style="color:red;">{{ $message }}</span> @enderror
+        </div>
+
+        <div style="margin-bottom: 10px;">
+            <label>Nouvelle image :</label><br>
+            <input type="file" name="image" accept="image/*">
+            @error('image') <span style="color:red;">{{ $message }}</span> @enderror
+        </div>
+
+        <div style="margin-bottom: 10px;">
+            <label>Nouveau fichier audio ou vidéo :</label><br>
+            <input type="file" name="fichier_media" accept="audio/*,video/*">
+            @error('fichier_media') <span style="color:red;">{{ $message }}</span> @enderror
         </div>
 
         <button type="submit" style="padding: 10px; background-color: #3490dc; color: white; border: none; border-radius: 5px;">

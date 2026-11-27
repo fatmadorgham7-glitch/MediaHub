@@ -13,6 +13,16 @@
         <div class="contenu-texte">
             {{ $publication->contenu }}
         </div>
+
+        @if ($publication->image)
+            <img src="{{ Storage::url($publication->image) }}" alt="{{ $publication->titre }}" style="max-width:100%;">
+        @endif
+
+        @if ($publication->type_media === 'audio')
+            <audio controls src="{{ Storage::url($publication->fichier_media) }}"></audio>
+        @elseif ($publication->type_media === 'video')
+            <video controls src="{{ Storage::url($publication->fichier_media) }}" style="max-width:100%;"></video>
+        @endif
     </article>
 
     @can('update', $publication)
