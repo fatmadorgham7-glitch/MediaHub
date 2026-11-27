@@ -42,7 +42,7 @@ class ContenuController extends Controller
             $enregistre = true;
         } finally {
             if (! $enregistre) {
-                $mediaStorage->delete($mediaStorage->paths($fichiers));
+                $mediaStorage->delete($fichiers);
             }
         }
 
@@ -72,36 +72,22 @@ class ContenuController extends Controller
         $this->authorize('update', $publication);
         $donnees = $request->validated();
         $fichiers = $mediaStorage->storeFromRequest($request);
-        $anciensFichiers = [];
-
-        foreach (['image', 'fichier_media'] as $champ) {
-            $remplaceOuSupprime = isset($fichiers[$champ])
-                || (array_key_exists($champ, $donnees) && $donnees[$champ] === null);
-
-            if ($remplaceOuSupprime && $publication->{$champ}) {
-                $anciensFichiers[] = $publication->{$champ};
-            }
-        }
-
-        if (array_key_exists('fichier_media', $donnees) && $donnees['fichier_media'] === null) {
-            $donnees['type_media'] = null;
-        }
-
+        $miseAJour = $mediaStorage->prepareUpdate($request, $publication, $donnees, $fichiers);
         $enregistre = false;
 
         try {
-            if (! $publication->update(array_merge($donnees, $fichiers))) {
+            if (! $publication->update($miseAJour['attributes'])) {
                 throw new \RuntimeException('Impossible d’enregistrer la publication.');
             }
 
             $enregistre = true;
         } finally {
             if (! $enregistre) {
-                $mediaStorage->delete($mediaStorage->paths($fichiers));
+                $mediaStorage->delete($fichiers);
             }
         }
 
-        $mediaStorage->delete($anciensFichiers);
+        $mediaStorage->delete($miseAJour['old_files']);
 
         return redirect()->route('contenus.show', $publication)->with('succes', 'Publication mise à jour avec succès.');
     }

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PublicationController;
+use App\Http\Controllers\PublicationDocumentController;
 use App\Models\Categorie;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +25,9 @@ Route::get('/categories', function () {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/publications/{publication}/document', PublicationDocumentController::class)
+        ->name('api.publications.document');
+
     Route::apiResource('publications', PublicationController::class)
         ->except(['index', 'show']);
 });

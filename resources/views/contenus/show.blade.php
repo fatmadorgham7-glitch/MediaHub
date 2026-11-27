@@ -23,6 +23,14 @@
         @elseif ($publication->type_media === 'video')
             <video controls src="{{ Storage::url($publication->fichier_media) }}" style="max-width:100%;"></video>
         @endif
+
+        @auth
+            @can('viewDocument', $publication)
+                @if ($publication->document)
+                    <p><a href="{{ route('contenus.document', $publication) }}">Télécharger le document privé</a></p>
+                @endif
+            @endcan
+        @endauth
     </article>
 
     @can('update', $publication)

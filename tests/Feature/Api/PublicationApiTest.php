@@ -91,4 +91,50 @@ class PublicationApiTest extends TestCase
 
         Storage::disk('public')->assertMissing($chemin);
     }
+
+    public function test_le_document_api_est_interdit_aux_utilisateurs_non_autorises(): void
+    {
+        Storage::fake('local');
+
+        $auteur = User::factory()->create();
+        $autreUtilisateur = User::factory()->create();
+        $document = 'documents/guide.pdf';
+        Storage::disk('local')->put($document, 'contenu prive');
+        $publication = Publication::factory()->create([
+            'user_id' => $auteur->id,
+            'document' => $document,
+        ]);
+
+        $this->getJson("/api/publications/{$publication->id}/document")
+            ->assertUnauthorized();
+
+        $autreJeton = $autreUtilisateur->createToken('autre')->plainTextToken;
+        $this->withToken($autreJeton)
+            ->getJson("/api/publications/{$publication->id}/document")
+            ->assertForbidden();
+    }
+
+    public function test_l_auteur_peut_telecharger_le_document_depuis_l_api(): void
+    {
+        Storage::fake('local');
+
+        $auteur = User::factory()->create();
+        $document = 'documents/guide.pdf';
+        Storage::disk('local')->put($document, 'contenu prive');
+        $publication = Publication::factory()->create([
+            'user_id' => $auteur->id,
+            'document' => $document,
+        ]);
+
+        $jetonAuteur = $auteur->createToken('auteur')->plainTextToken;
+        $this->withToken($jetonAuteur)
+            ->get("/api/publications/{$publication->id}/document")
+            ->assertOk()
+            ->assertDownload('guide.pdf');
+
+        $this->getJson("/api/publications/{$publication->id}")
+            ->assertOk()
+            ->assertJsonPath('data.document_url', route('api.publications.document', $publication))
+            ->assertJsonMissingPath('data.document');
+    }
 }

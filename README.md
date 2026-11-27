@@ -9,7 +9,8 @@ Plateforme Laravel de gestion et de diffusion de contenus multimédias.
 - CRUD complet des catégories et publications.
 - Inscription, connexion, déconnexion et rôles administrateur/auteur.
 - Policies et gate administrateur.
-- Images, fichiers audio et vidéo.
+- Images ou fichiers audio/vidéo (un seul média public par publication).
+- Documents PDF/DOCX conservés sur un disque privé et accessibles à l'auteur ou à l'administrateur.
 - API REST protégée par Laravel Sanctum.
 - Tests automatisés Laravel.
 

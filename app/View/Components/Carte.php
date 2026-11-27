@@ -13,6 +13,9 @@ class Carte extends Component
      */
     public function __construct(
         public string $titre,
+        public ?string $image = null,
+        public ?string $fichierMedia = null,
+        public ?string $typeMedia = null,
         public bool $miseEnAvant = false
     ) {}
 

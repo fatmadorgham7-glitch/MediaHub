@@ -47,6 +47,11 @@ class PublicationPolicy
         return $this->update($user, $publication);
     }
 
+    public function viewDocument(User $user, Publication $publication): bool
+    {
+        return $this->update($user, $publication);
+    }
+
     /**
      * Determine whether the user can restore the model.
      */

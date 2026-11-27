@@ -14,11 +14,15 @@
 
     <div class="grille">
         @forelse ($contenus as $contenu)
-            <div style="border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 5px;">
-                <h2>{{ $contenu->titre }}</h2>
+            <x-carte
+                :titre="$contenu->titre"
+                :image="$contenu->image"
+                :fichier-media="$contenu->fichier_media"
+                :type-media="$contenu->type_media"
+            >
                 <p>Catégorie : {{ $contenu->categorie->nom }}</p>
                 <p>Auteur : {{ $contenu->auteur->name }}</p>
-                
+
                 <!-- Les boutons d'actions -->
                 <div style="margin-top: 10px;">
                     <a href="{{ route('contenus.show', $contenu) }}">Voir</a> |
@@ -36,7 +40,7 @@
                     </form>
                     @endcan
                 </div>
-            </div>
+            </x-carte>
         @empty
             <p>Aucun contenu disponible pour le moment.</p>
         @endforelse

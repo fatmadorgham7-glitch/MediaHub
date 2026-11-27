@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\ContenuController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\PublicationDocumentController;
 use Illuminate\Support\Facades\Route;
 
 // 1. Page d'accueil
@@ -28,6 +29,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('contenus', ContenuController::class)
         ->parameters(['contenus' => 'publication'])
         ->only(['create', 'store', 'edit', 'update', 'destroy']);
+
+    Route::get('/contenus/{publication}/document', PublicationDocumentController::class)
+        ->name('contenus.document');
 });
 
 Route::resource('contenus', ContenuController::class)

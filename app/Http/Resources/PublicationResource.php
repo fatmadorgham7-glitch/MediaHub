@@ -24,6 +24,7 @@ class PublicationResource extends JsonResource
             'image' => $this->image ? Storage::url($this->image) : null,
             'fichier_media' => $this->fichier_media ? Storage::url($this->fichier_media) : null,
             'type_media' => $this->type_media,
+            'document_url' => $this->document ? route('api.publications.document', $this->resource) : null,
             'commentaires_count' => $this->commentaires_count,
             'publie_le' => $this->created_at?->toDateString(),
         ];

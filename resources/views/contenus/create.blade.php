@@ -33,15 +33,23 @@
         </div>
 
         <div style="margin-bottom: 10px;">
-            <label>Image :</label><br>
-            <input type="file" name="image" accept="image/*">
+            <label>Image (facultative) :</label><br>
+            <input type="file" name="image" accept=".jpg,.jpeg,.png,.webp,.gif,.bmp,image/jpeg,image/png,image/webp,image/gif,image/bmp">
             @error('image') <span style="color:red;">{{ $message }}</span> @enderror
         </div>
 
         <div style="margin-bottom: 10px;">
-            <label>Fichier audio ou vidéo :</label><br>
+            <label>Fichier audio ou vidéo (facultatif) :</label><br>
             <input type="file" name="fichier_media" accept="audio/*,video/*">
             @error('fichier_media') <span style="color:red;">{{ $message }}</span> @enderror
+        </div>
+
+        <p>Choisissez au maximum une image ou un fichier audio/vidéo.</p>
+
+        <div style="margin-bottom: 10px;">
+            <label>Document privé PDF ou DOCX (facultatif) :</label><br>
+            <input type="file" name="document" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+            @error('document') <span style="color:red;">{{ $message }}</span> @enderror
         </div>
 
         <button type="submit" style="padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 5px;">

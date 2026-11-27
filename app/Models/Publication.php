@@ -21,6 +21,7 @@ class Publication extends Model
         'image',
         'fichier_media',
         'type_media',
+        'document',
     ];
 
     protected static function booted(): void
@@ -37,13 +38,38 @@ class Publication extends Model
             Cache::forget('categories.liste');
         });
 
-        static::forceDeleted(function (Publication $publication) {
-            foreach ([$publication->image, $publication->fichier_media] as $chemin) {
-                if ($chemin && ! Storage::disk('public')->delete($chemin)) {
-                    throw new RuntimeException("Impossible de supprimer le fichier média « {$chemin} ».");
-                }
+        static::deleting(function (Publication $publication) {
+            if ($publication->isForceDeleting()) {
+                return;
             }
+
+            $publication->deleteStoredMedia();
+            $publication->forceFill([
+                'image' => null,
+                'fichier_media' => null,
+                'type_media' => null,
+                'document' => null,
+            ])->saveQuietly();
         });
+
+        static::forceDeleted(function (Publication $publication) {
+            $publication->deleteStoredMedia();
+        });
+    }
+
+    private function deleteStoredMedia(): void
+    {
+        foreach ([
+            'image' => 'public',
+            'fichier_media' => 'public',
+            'document' => 'local',
+        ] as $champ => $disque) {
+            $chemin = $this->{$champ};
+
+            if ($chemin && ! Storage::disk($disque)->delete($chemin)) {
+                throw new RuntimeException("Impossible de supprimer le fichier média « {$chemin} ».");
+            }
+        }
     }
 
     public function categorie()

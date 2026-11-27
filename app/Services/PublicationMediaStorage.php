@@ -2,25 +2,32 @@
 
 namespace App\Services;
 
+use App\Models\Publication;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 
 class PublicationMediaStorage
 {
+    private const UPLOADS = [
+        'image' => ['folder' => 'publications', 'disk' => 'public'],
+        'fichier_media' => ['folder' => 'medias', 'disk' => 'public'],
+        'document' => ['folder' => 'documents', 'disk' => 'local'],
+    ];
+
     public function storeFromRequest(Request $request): array
     {
         $fichiers = [];
         $enregistre = false;
 
         try {
-            foreach (['image' => 'publications', 'fichier_media' => 'medias'] as $champ => $dossier) {
+            foreach (self::UPLOADS as $champ => $destination) {
                 if (! $request->hasFile($champ)) {
                     continue;
                 }
 
                 $fichier = $request->file($champ);
-                $chemin = $fichier->store($dossier, 'public');
+                $chemin = $fichier->store($destination['folder'], $destination['disk']);
 
                 if ($chemin === false) {
                     throw new RuntimeException("Impossible de stocker le fichier « {$champ} ».");
@@ -40,23 +47,58 @@ class PublicationMediaStorage
             return $fichiers;
         } finally {
             if (! $enregistre) {
-                $this->delete($this->paths($fichiers));
+                $this->delete($fichiers);
             }
         }
     }
 
-    public function paths(array $fichiers): array
-    {
-        return array_values(array_filter([
-            $fichiers['image'] ?? null,
-            $fichiers['fichier_media'] ?? null,
-        ]));
+    /**
+     * @return array{attributes: array<string, mixed>, old_files: array<string, string>}
+     */
+    public function prepareUpdate(
+        Request $request,
+        Publication $publication,
+        array $donnees,
+        array $nouveauxFichiers
+    ): array {
+        $anciensFichiers = [];
+
+        foreach (self::UPLOADS as $champ => $destination) {
+            $suppressionDemandee = $request->boolean('retirer_'.$champ)
+                || ($request->isJson()
+                    && array_key_exists($champ, $donnees)
+                    && $donnees[$champ] === null);
+
+            if ((isset($nouveauxFichiers[$champ]) || $suppressionDemandee) && $publication->{$champ}) {
+                $anciensFichiers[$champ] = $publication->{$champ};
+            }
+
+            if ($suppressionDemandee) {
+                $donnees[$champ] = null;
+            }
+        }
+
+        unset($donnees['retirer_image'], $donnees['retirer_fichier_media'], $donnees['retirer_document']);
+
+        if ($request->boolean('retirer_fichier_media')
+            || ($request->isJson()
+                && array_key_exists('fichier_media', $donnees)
+                && $donnees['fichier_media'] === null)) {
+            $donnees['type_media'] = null;
+        }
+
+        return [
+            'attributes' => array_merge($donnees, $nouveauxFichiers),
+            'old_files' => $anciensFichiers,
+        ];
     }
 
-    public function delete(array $chemins): void
+    public function delete(array $fichiers): void
     {
-        foreach ($chemins as $chemin) {
-            if ($chemin && ! Storage::disk('public')->delete($chemin)) {
+        foreach (self::UPLOADS as $champ => $destination) {
+            $chemin = $fichiers[$champ] ?? null;
+
+            if ($chemin && ! Storage::disk($destination['disk'])->delete($chemin)) {
                 throw new RuntimeException("Impossible de supprimer le fichier « {$chemin} ».");
             }
         }
