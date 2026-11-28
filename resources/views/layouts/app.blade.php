@@ -3,42 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('titre', 'MediaHub')</title>@yield('meta')
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <meta name="theme-color" content="#0b0e0c">
+    <title>@yield('titre', 'MediaHub') — MediaHub</title>
+    @yield('meta')
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
 </head>
 <body>
-    @include('partials.navigation')
+    <div class="app-shell">
+        @include('partials.navigation')
 
-    <main class="conteneur">
-        <!-- 1. Message de succès (bouton vert) -->
-        @if (session('succes'))
-            <div style="background-color: #d4edda; color: #155724; padding: 15px; margin-bottom: 20px; border-radius: 5px; border: 1px solid #c3e6cb;">
-                {{ session('succes') }}
-            </div>
-        @endif
+        <div class="app-workspace">
+            <header class="workspace-topbar">
+                <div class="breadcrumbs">
+                    <span class="breadcrumb-dot" aria-hidden="true"></span>
+                    <span>MediaHub</span>
+                    <span aria-hidden="true">/</span>
+                    <strong>@yield('titre', 'Accueil')</strong>
+                </div>
+                <a class="topbar-link" href="{{ route('contenus.index') }}">
+                    Explorer les contenus
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+                </a>
+            </header>
 
-        <!-- 2. Message d'erreur personnalisé (ex: suppression impossible) -->
-        @if (session('erreur'))
-            <div style="background-color: #f8d7da; color: #721c24; padding: 15px; margin-bottom: 20px; border-radius: 5px; border: 1px solid #f5c6cb;">
-                {{ session('erreur') }}
-            </div>
-        @endif
+            <main class="main-content">
+                <div class="conteneur">
+                    @if (session('succes'))
+                        <div class="alert alert-success" role="status">{{ session('succes') }}</div>
+                    @endif
 
-        <!-- 3. Erreurs de validation du formulaire (champs vides, etc.) -->
-        @if ($errors->any())
-            <div style="background-color: #fff3cd; color: #856404; padding: 15px; margin-bottom: 20px; border-radius: 5px; border: 1px solid #ffeeba;">
-                <strong>Attention, veuillez corriger les erreurs suivantes :</strong>
-                <ul style="margin-top: 10px; margin-bottom: 0;">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+                    @if (session('erreur'))
+                        <div class="alert alert-danger" role="alert">{{ session('erreur') }}</div>
+                    @endif
 
-        @yield('contenu')
-    </main>
+                    @if ($errors->any())
+                        <div class="alert alert-validation" role="alert">
+                            <strong>Quelques points sont à corriger :</strong>
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
-    @include('partials.pied-de-page')
+                    @yield('contenu')
+                </div>
+            </main>
+
+            @include('partials.pied-de-page')
+        </div>
+    </div>
 </body>
 </html>

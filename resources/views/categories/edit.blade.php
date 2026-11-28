@@ -1,14 +1,30 @@
 @extends('layouts.app')
 @section('titre', 'Modifier une catégorie')
 @section('contenu')
-    <h1>Modifier une catégorie</h1>
-    <form method="POST" action="{{ route('categories.update', $categorie) }}">
+    <section class="page-heading">
+        <div>
+            <p class="eyebrow">Administration</p>
+            <h1>Modifier une catégorie</h1>
+            <p class="page-intro">Mettez à jour le nom ou l'identifiant de cette catégorie.</p>
+        </div>
+    </section>
+    <form class="form-panel category-form" method="POST" action="{{ route('categories.update', $categorie) }}">
         @csrf
         @method('PUT')
-        <div><label>Nom</label><br><input name="nom" value="{{ old('nom', $categorie->nom) }}" style="width:100%;">
-            @error('nom') <span style="color:red;">{{ $message }}</span> @enderror</div>
-        <div style="margin-top:10px;"><label>Slug</label><br><input name="slug" value="{{ old('slug', $categorie->slug) }}" style="width:100%;">
-            @error('slug') <span style="color:red;">{{ $message }}</span> @enderror</div>
-        <button type="submit" style="margin-top:10px;">Mettre à jour</button>
+        <div class="form-field">
+            <label for="nom">Nom</label>
+            <input class="form-control" id="nom" name="nom" value="{{ old('nom', $categorie->nom) }}" minlength="3" maxlength="255" required>
+            @error('nom') <span class="form-error" role="alert">{{ $message }}</span> @enderror
+        </div>
+        <div class="form-field">
+            <label for="slug">Slug</label>
+            <input class="form-control" id="slug" name="slug" value="{{ old('slug', $categorie->slug) }}" maxlength="255" required>
+            <p class="form-help">Identifiant lisible utilisé dans les URL.</p>
+            @error('slug') <span class="form-error" role="alert">{{ $message }}</span> @enderror
+        </div>
+        <div class="form-actions">
+            <a class="button button-secondary" href="{{ route('categories.index') }}">Annuler</a>
+            <button class="button button-primary" type="submit">Enregistrer les modifications</button>
+        </div>
     </form>
 @endsection
