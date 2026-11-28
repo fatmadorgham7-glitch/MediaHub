@@ -7,6 +7,7 @@ use App\Models\Publication;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -127,6 +128,7 @@ class PublicationApiTest extends TestCase
         $user = User::factory()->create();
         $categorie = Categorie::factory()->create();
         $token = $user->createToken('test')->plainTextToken;
+        Log::spy();
 
         $response = $this->withToken($token)->postJson('/api/publications', [
             'titre' => 'Publication avec image',
@@ -140,6 +142,9 @@ class PublicationApiTest extends TestCase
 
         $publication = Publication::where('titre', 'Publication avec image')->firstOrFail();
         Storage::disk('public')->assertExists($publication->image);
+        Log::shouldHaveReceived('info')
+            ->once()
+            ->with('Publication créée', ['id' => $publication->id]);
     }
 
     public function test_mise_a_jour_api_supprime_un_media_explicitement_efface(): void

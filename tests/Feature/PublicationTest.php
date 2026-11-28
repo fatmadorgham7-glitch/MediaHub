@@ -5,9 +5,12 @@ namespace Tests\Feature;
 use App\Models\Categorie;
 use App\Models\Publication;
 use App\Models\User;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -46,6 +49,53 @@ class PublicationTest extends TestCase
         $this->get('/contenus')
             ->assertOk()
             ->assertSee(Storage::url($image), false);
+    }
+
+    public function test_creation_web_journalise_levenement_publication_creee(): void
+    {
+        $auteur = User::factory()->create();
+        $categorie = Categorie::factory()->create();
+        Log::spy();
+
+        $this->actingAs($auteur)
+            ->post('/contenus', [
+                'titre' => 'Publication avec événement',
+                'contenu' => str_repeat('contenu ', 5),
+                'categorie_id' => $categorie->id,
+            ])
+            ->assertRedirect('/contenus');
+
+        $publication = Publication::where('titre', 'Publication avec événement')->firstOrFail();
+        Log::shouldHaveReceived('info')
+            ->once()
+            ->with('Publication créée', ['id' => $publication->id]);
+    }
+
+    public function test_loptimisation_de_la_liste_elimine_les_requetes_n_plus_un(): void
+    {
+        Publication::factory()->count(9)->create();
+        $nombreRequetes = 0;
+        DB::listen(function (QueryExecuted $query) use (&$nombreRequetes): void {
+            $nombreRequetes++;
+        });
+
+        $publications = Publication::latest()->paginate(9);
+
+        foreach ($publications as $publication) {
+            $publication->categorie->nom;
+            $publication->auteur->name;
+            $publication->commentaires->count();
+        }
+
+        $requetesNonOptimisees = $nombreRequetes;
+        $nombreRequetes = 0;
+
+        $this->get('/contenus')->assertOk();
+        $requetesOptimisees = $nombreRequetes;
+
+        $this->assertSame(29, $requetesNonOptimisees);
+        $this->assertSame(4, $requetesOptimisees);
+        $this->assertGreaterThan($requetesOptimisees, $requetesNonOptimisees);
     }
 
     public function test_une_publication_refuse_deux_medias_publics(): void

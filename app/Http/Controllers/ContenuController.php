@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PublicationCreee;
 use App\Http\Requests\StorePublicationRequest;
 use App\Http\Requests\UpdatePublicationRequest;
 use App\Models\Categorie;
@@ -38,13 +39,15 @@ class ContenuController extends Controller
         $enregistre = false;
 
         try {
-            Publication::create(array_merge($donnees, $fichiers));
+            $publication = Publication::create(array_merge($donnees, $fichiers));
             $enregistre = true;
         } finally {
             if (! $enregistre) {
                 $mediaStorage->delete($fichiers);
             }
         }
+
+        event(new PublicationCreee($publication));
 
         return redirect()->route('contenus.index')->with('succes', 'Publication créée avec succès.');
     }

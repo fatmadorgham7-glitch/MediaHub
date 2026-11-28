@@ -6,6 +6,7 @@ use App\Models\Categorie;
 use App\Models\Publication;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
 class CategoryAuthorizationTest extends TestCase
@@ -45,5 +46,34 @@ class CategoryAuthorizationTest extends TestCase
             ->assertSessionHas('erreur');
 
         $this->assertDatabaseHas('categories', ['id' => $categorie->id]);
+    }
+
+    public function test_un_admin_peut_effectuer_le_crud_des_categories_et_le_cache_est_invalide(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        Cache::forget('categories.liste');
+        $this->get('/categories')->assertOk();
+        $this->assertTrue(Cache::has('categories.liste'));
+
+        $this->actingAs($admin)
+            ->post('/categories', ['nom' => 'Podcast', 'slug' => 'podcast'])
+            ->assertRedirect('/categories');
+        $this->assertFalse(Cache::has('categories.liste'));
+
+        $categorie = Categorie::where('slug', 'podcast')->firstOrFail();
+        $this->get('/categories')->assertOk()->assertSee('Podcast');
+
+        $this->put("/categories/{$categorie->id}", [
+            'nom' => 'Podcasts',
+            'slug' => 'podcasts',
+        ])->assertRedirect('/categories');
+        $this->assertFalse(Cache::has('categories.liste'));
+        $this->get('/categories')->assertOk()->assertSee('Podcasts');
+
+        $this->delete("/categories/{$categorie->id}")
+            ->assertRedirect('/categories');
+        $this->assertFalse(Cache::has('categories.liste'));
+        $this->assertDatabaseMissing('categories', ['id' => $categorie->id]);
     }
 }

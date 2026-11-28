@@ -1,4 +1,4 @@
-# Rapport de qualité
+# Rapport de qualité — Semaine 11
 
 ## Vérifications
 
@@ -9,6 +9,22 @@ php artisan test
 vendor/bin/pint --test
 npm run build
 ```
+
+Dernière exécution complète de `php artisan test` : **47 tests réussis sur 47 (100 %), 199 assertions**.
+
+## Optimisation N+1
+
+Sur neuf publications, le parcours non optimisé a été mesuré en paginant puis en chargeant séparément la catégorie, l'auteur et les commentaires de chaque publication : **29 requêtes SQL**. Cette mesure reproduit le comportement avec chargement paresseux afin de comparer le même volume de données.
+
+La liste actuelle dans `ContenuController` utilise `with(['categorie', 'auteur'])` et `withCount('commentaires')`. Le même scénario HTTP `/contenus` exécute **4 requêtes**, soit 25 de moins (environ 86 % de réduction). Un test utilise `DB::listen()` pour compter les requêtes et prévenir une régression.
+
+## Mise en cache
+
+La liste des catégories et le compteur de publications sont conservés sous la clé `categories.liste` pendant **3 600 secondes (1 heure)**. Le cache est invalidé après création, modification ou suppression d'une catégorie, ainsi qu'après sauvegarde, suppression ou restauration d'une publication. Les tests vérifient l'invalidation à travers le CRUD des catégories et la création d'une publication.
+
+## Événement et journalisation
+
+La création d'une publication depuis le site ou l'API déclenche `PublicationCreee`. Son listener `JournaliserPublicationCreee` consigne l'identifiant avec `Log::info()`. Les deux parcours de création sont testés.
 
 ## Sécurité et cohérence
 

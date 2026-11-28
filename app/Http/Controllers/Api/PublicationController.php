@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\PublicationCreee;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePublicationRequest;
 use App\Http\Requests\UpdatePublicationRequest;
@@ -49,6 +50,8 @@ class PublicationController extends Controller
                 $mediaStorage->delete($fichiers);
             }
         }
+
+        event(new PublicationCreee($publication));
 
         return (new PublicationResource($publication->load(['categorie', 'auteur'])->loadCount('commentaires')))
             ->response()
