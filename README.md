@@ -39,3 +39,6 @@ php artisan route:list
 
 - [Documentation API](./API.md)
 - [Rapport de qualité](./QUALITE.md)
+- [Préparation et déploiement](./DEPLOIEMENT.md)
+- [Support de soutenance](./SOUTENANCE.md)
+- [Dépôt GitHub](https://github.com/fatmadorgham7-glitch/MediaHub)
